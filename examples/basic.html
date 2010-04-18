@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Outside Events Basic Example</title>
+    <style type="text/css">
+        body {
+            background: #fff;
+            color: #000;
+        }
+        
+        div {
+            background: #eee;
+            border: 2px solid #666;
+            height: 80px;
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 260px;
+        }
+        
+        .outside {
+            background: #000;
+            color: #fff;
+        }
+        
+        code {
+            border: 1px solid #bbb;
+            background: #ddd;
+            padding: 1px 2px 0;
+        }
+        
+        .outside code { background: #333; }
+    </style>
+</head>
+
+<body>
+    <h1>Outside Events Basic Example</h1>
+    
+    <div>
+        Click outside of me to trigger my <code>clickoutside</code> event.
+        <p></p>
+    </div>
+    
+    <script src="http://yui.yahooapis.com/3.1.0/build/yui/yui-min.js"></script>
+    <script src="../src/outside-events.js"></script>
+    <script>
+        YUI().use('gallery-outside-events', function (Y) {
+            var div = Y.one('div'),
+                timer;
+            
+            div.on('clickoutside', function (e) {
+                clearTimeout(timer);
+                
+                this.addClass('outside');
+                this.one('p').set('innerHTML', 'Yay!');
+                
+                timer = setTimeout(function () {
+                    div.removeClass('outside');
+                    div.one('p').set('innerHTML', '');
+                }, 800);
+            });
+            
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Outside Events Dialog Example</title>
+    <style type="text/css">
+        body {
+            background: #fff;
+            color: #000;
+        }
+        
+        #dialog {
+            background: #eee;
+            border: 2px solid #666;
+            box-shadow: 0 0 10px #555;
+            left: 50%;
+            margin-left: -240px;
+            position: absolute;
+            top: 10%;
+            width: 480px;
+            -moz-box-shadow: 0 0 10px #555;
+            -webkit-box-shadow: 0 0 10px #555;
+        }
+        
+        #dialog h3 {
+            border-bottom: 1px solid #777;
+            background: #ddd;
+            padding: 4px 5px;
+            margin-top: 0;
+        }
+        
+        #dialog p { padding: 0 12px; }
+        
+        #dialog ul {
+            margin-bottom: 20px;
+            margin-right: 35px;
+        }
+        
+        #dialog li { margin-top: 10px; }
+        
+        #dialog li button,
+        #dialog li a {
+            display: inline-block;
+            width: 120px;
+        }
+        
+        #dialog li p {
+            padding: 0;
+            margin: 0.6em 0 0;
+        }
+        
+        .hidden { display: none; }
+        
+        code {
+            border: 1px solid #ccc;
+            background: #eee;
+            padding: 1px 2px 0;
+        }
+        
+        #dialog code {
+            background: #ddd;
+            border-color: #bbb;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Outside Events Dialog Example</h1>
+    <p>
+        This example illustrates some important things to pay attention to when 
+        using outside events.
+    </p>
+    <p>
+        Each of the following buttons or links does something special. Give them a try.
+    </p>
+    <p>
+        <button id="show">Show Dialog</button>
+        Displays a dialog.
+    </p>
+    <p>
+        <a href="http://yahoo.com" id="link">Visit Yahoo!</a>
+        Attempts to navigate away from the page.
+    </p>
+    <p>
+        <button id="prop">Evil Button</button>
+        Isn't very friendly, and sometimes enjoys ruining your day.
+    </p>
+    
+    <div id="dialog" class="hidden">
+        <h3>Sample Dialog</h3>
+        <p>
+            Clicking on me, or any of my children should do nothing, but clicking
+            <em>almost</em> anywhere outside of me should close me. Some important
+            things to notice are:
+        </p>
+        <ul>
+            <li>
+                Clicking <strong>Show Dialog</strong> again will not close me. This
+                is because my <code>clickoutside</code> handler prevents clicks on
+                <strong>Show Dialog</strong> from closing me. This isn't really a
+                gotcha, but illustrates how outside event handlers have access
+                to the originating event target.
+            </li>
+            <li>
+                Clicking <strong>Visit Yahoo!</strong> will close me, and <code>preventDefault</code>
+                will be called on the originating <code>click</code> event preventing
+                navigation away from the page.
+                
+                <p>
+                    However, any <code>click</code> event handlers <strong>will run
+                    before</strong> my <code>clickoutside</code> event handler. This is
+                    because outside events are not fired until the originating event
+                    bubbles up to the <code>document</code>.
+                </p>
+            </li>
+            <li>
+                Clicking <strong>Evil Button</strong> will not close me because
+                <code>stopPropagation</code> is called on the originating <code>click</code>
+                event, preventing it from bubbling up to the <code>document</code>.
+            </li>
+        </ul>
+        <p>
+            <input type="text">
+            <button>button</button>
+            <label><input type="checkbox"> checkbox</label>
+        </p>
+    </div>
+    
+    <script src="http://yui.yahooapis.com/3.1.0/build/yui/yui-min.js"></script>
+    <script src="../src/outside-events.js"></script>
+    <script>
+        YUI().use('gallery-outside-events', function (Y) {
+            var dialog = Y.one('#dialog');
+            
+            Y.one('#link').on('click', function (e) {
+                var text = "You clicked the link.";
+                
+                text += (dialog.hasClass('hidden')) ?
+                    "\n\nNavigating away now. See ya!" :
+                    "\n\nDon't worry, the click handler called preventDefault." +
+                        "\n\nYou can stay on this page a bit longer.";
+                
+                alert(text);
+            });
+            
+            Y.one('#prop').on('click', function (e) {
+                e.stopPropagation();
+                
+                if (!dialog.hasClass('hidden')) {
+                    alert(
+                        "You clicked the Evil Button!" +
+                        "\n\nThe evil click handler called stopPropagation." +
+                        "\n\nThe dialog will stay visible."
+                    );
+                }
+            });
+            
+            Y.one('#show').on('click', function (e) {
+                if (!dialog.hasClass('hidden')) {
+                    alert('The dialog is already visible, silly!');
+                }
+                
+                dialog.removeClass('hidden');
+                
+                var handle = dialog.on('clickoutside', function (e) {
+                    var targetId  = e.target.get('id');
+                    
+                    if (targetId === 'link' && !this.hasClass('hidden')) {
+                        e.preventDefault();
+                    }
+                    
+                    if (targetId === 'show') {
+                        return;
+                    }
+                    
+                    this.addClass('hidden');
+                    handle.detach();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

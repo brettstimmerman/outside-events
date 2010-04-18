@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Outside Events Ancestors Example</title>
+    <style type="text/css">
+        body {
+            background: #fff;
+            color: #000;
+            position: relative;
+        }
+        
+        div {
+            border: 3px solid #000;
+            height: 1%; /* A curse on IE6 and its hasLayout shenanigans! */
+            margin: 0.75em;
+            padding: 0.33em;
+        }
+        
+        .outside {
+            background: #ff9 !important;
+            border-color: #f30 !important;
+            color: #f00;
+        }
+        
+        code {
+            border: 1px solid #ccc;
+            background: #eee;
+            padding: 1px 2px;
+        }
+        
+        #a, #e     { background: #ccf; border-color: #009; width: 400px ;}
+        #b, #d, #f { background: #99f; border-color: #007; }
+        #c, #g, #h { background: #66f; border-color: #006; }
+        #others    { background: #33f; border-color: #004; }
+    </style>
+</head>
+
+<body>
+    <h1>Outside Events Ancestors Example</h1>
+    <p>
+        This example illustrates how ancestors are excluded from outside events.
+    </p>
+    <p>
+        Mouse over the nested boxes below. Notice that ancestors of <code>mouseover</code>
+        targets do not receive the <code>mouseoveroutside</code> event.
+    </p>
+    
+    <div id="a">
+        A <span></span>
+        <div id="b">
+            B <span></span>
+            <div id="c">
+                C <span></span>
+            </div>
+        </div>
+        <div id="d">
+            D <span></span>
+        </div>
+    </div>
+    <div id="e">
+        E <span></span>
+        <div id="f">
+            F <span></span>
+            <div id="g">
+                G <span></span>
+            </div>
+            <div id="h">
+                H <span></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="http://yui.yahooapis.com/3.1.0/build/yui/yui-min.js"></script>
+    <script src="../src/outside-events.js"></script>
+    <script>
+        YUI().use('gallery-outside-events', function (Y) {
+            var nodes     = [],
+                selectors = ['#a','#b','#c','#d','#e','#f','#g','#h'];
+                
+            function setup(selector) {
+                var node = Y.one(selector);
+                
+                node.on('mouseoveroutside', function (e) {
+                    var target = e.target,
+                        id     = target.get('id'),
+                        text   = 'mouseover: ' + target.get('tagName').toLowerCase() +
+                            (id ? '#' + id : '');
+                    
+                    this.addClass('outside');
+                    this.one('span').set('innerHTML', text);
+                });
+                
+                nodes.push(node);
+            }
+            
+            Y.one('doc').on('mouseover', function (e) {
+                Y.each(nodes, function (n) {
+                    n.removeClass('outside');
+                    n.one('span').set('innerHTML', '');
+                });
+            });
+            
+            Y.each(selectors, setup);
+        });
+    </script>
+</body>
+</html>
