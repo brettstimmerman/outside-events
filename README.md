@@ -20,7 +20,7 @@ broken down here.
 
 Subscribe to outside events as you would any other DOM event.
 
-    Y.one('#dialog).on('clickoutside', function (e) {
+    Y.one('#dialog').on('clickoutside', function (e) {
         this.addClass('hidden');
     });
 
