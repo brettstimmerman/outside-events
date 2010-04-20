@@ -38,7 +38,7 @@ Y.Event.defineOutside = function (event, name) {
         publishConfig: { emitFacade: false },
         
         detach: function (node, sub, evt) {
-            if (Y.Object.keys(evt.getSubs()[0]).length === 1) {
+            if (this.subscriberCount(evt) === 1) {
                 evt.handle.detach();
             }
         },
@@ -60,14 +60,16 @@ Y.Event.defineOutside = function (event, name) {
         },
         
         on: function (node, sub, evt) {
-            if (Y.Object.keys(evt.getSubs()[0]).length === 1) {
+            if (this.subscriberCount(evt) === 1) {
                 this.init(node, sub, evt);
             }
+        },
+        
+        subscriberCount: function (evt) {
+            return Y.Object.keys(evt.getSubs()[0]).length;
         }
     });
 };
-
-Y.one('body').appendChild(Y.Node.create('<p id="log"></p>'));
 
 // Define outside events for some common native DOM events
 Y.each(nativeEvents, function (event) {

@@ -2,7 +2,7 @@ YUI().use('gallery-event-konami', 'gallery-outside-events', function (Y) {
     var selectors = [
             'blur','change','click','dblclick','focus','keydown','keypress',
             'keyup','mousedown','mousemove','mouseout','mouseover','mouseup',
-            'select','submit','konami'
+            'select','submit','konami','blur'
         ],
         timers = {};
     
