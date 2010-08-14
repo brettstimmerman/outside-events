@@ -11,7 +11,17 @@
  * @module gallery-outside-events
  */
 
-YUI.add('gallery-outside-events', function (Y) {
+YUI.add('gallery-outside-events', function(Y) {
+
+/**
+ * Outside events are synthetic DOM events that fire when a corresponding native
+ * or synthetic DOM event occurs outside a bound element.
+ *
+ * Many common outside events are pre-defined, and new outside events are cinch
+ * to define.
+ *
+ * @module gallery-outside-events
+ */
 
 // Outside events are pre-defined for each of these native DOM events
 var nativeEvents = [
@@ -31,43 +41,44 @@ var nativeEvents = [
  * @param {String} name (optional) custom outside event name
  */
 Y.Event.defineOutside = function (event, name) {
+    
     name = name || event + 'outside';
     
     Y.Event.define(name, {
         
-        publishConfig: { emitFacade: false },
-        
-        detach: function (node, sub, evt) {
-            if (this.subscriberCount(evt) === 1) {
-                evt.handle.detach();
-            }
+        on: function (node, sub, notifier) {
+            
+            sub.onHandle = Y.one('doc').on(event, function(e){
+            	if (this.isOutside(node, e.target)){
+            		notifier.fire(e);
+            	}
+            }, this);
         },
         
-        init: function (node, sub, evt) {
-            var doc = Y.one('doc');
+        detach: function (node, sub, notifier) {
             
-            function outside(el) {
-                return el !== doc && el !== node && !el.ancestor(function (p) {
-                        return p === node;
-                    });
-            }
+            sub.onHandle.detach();
+        },
+        
+        delegate: function (node, sub, notifier, filter) {
             
-            evt.handle = doc.on(event, function (e) {
-                if (outside(e.target)) {
-                    evt.fire(e);
+            sub.delegateHandle = Y.one('doc').delegate(event, function(e){
+                if (this.isOutside(node, e.target)) {
+                    notifier.fire(e);
                 }
-            });
+            }, filter, this);
         },
         
-        on: function (node, sub, evt) {
-            if (this.subscriberCount(evt) === 1) {
-                this.init(node, sub, evt);
-            }
+        detachDelegate : function (node, sub, notifier, filter) {
+            
+            sub.delegateHandle.detach();
         },
         
-        subscriberCount: function (evt) {
-            return Y.Object.keys(evt.getSubs()[0]).length;
+        isOutside: function (node, target) {
+            
+            return target !== node && ! target.ancestor(function(p){ return p === node; });
         }
+        
     });
 };
 
@@ -76,4 +87,5 @@ Y.each(nativeEvents, function (event) {
     Y.Event.defineOutside(event);
 });
 
-}, '1.0.0', { requires: ['event-focus', 'event-synthetic'] });
+
+}, '1.1.0' ,{requires:['event-focus', 'event-synthetic']});
