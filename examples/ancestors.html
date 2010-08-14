@@ -71,35 +71,33 @@
         </div>
     </div>
 
-    <script src="http://yui.yahooapis.com/3.1.0/build/yui/yui-min.js"></script>
+    <script src="http://yui.yahooapis.com/combo?3.2.0pr1/build/yui/yui-min.js"></script>
     <script src="../src/outside-events.js"></script>
     <script>
         YUI().use('gallery-outside-events', function (Y) {
-            var nodes     = [],
-                selectors = ['#a','#b','#c','#d','#e','#f','#g','#h'];
+            var selectors = ['#a','#b','#c','#d','#e','#f','#g','#h'],
+                timers    = {};
                 
             function setup(selector) {
                 var node = Y.one(selector);
                 
                 node.on('mouseoveroutside', function (e) {
+                    clearTimeout(timers[selector]);
+                    
                     var target = e.target,
                         id     = target.get('id'),
                         text   = 'mouseover: ' + target.get('tagName').toLowerCase() +
                             (id ? '#' + id : '');
                     
-                    this.addClass('outside');
-                    this.one('span').set('innerHTML', text);
+                    node.addClass('outside');
+                    node.one('span').set('innerHTML', text);
+                    
+                    timers[selector] = setTimeout(function () {
+                        node.removeClass('outside');
+                        node.one('span').set('innerHTML', '');
+                    }, 2000);
                 });
-                
-                nodes.push(node);
             }
-            
-            Y.one('doc').on('mouseover', function (e) {
-                Y.each(nodes, function (n) {
-                    n.removeClass('outside');
-                    n.one('span').set('innerHTML', '');
-                });
-            });
             
             Y.each(selectors, setup);
         });

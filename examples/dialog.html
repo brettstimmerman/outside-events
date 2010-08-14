@@ -126,7 +126,7 @@
         </p>
     </div>
     
-    <script src="http://yui.yahooapis.com/3.1.0/build/yui/yui-min.js"></script>
+    <script src="http://yui.yahooapis.com/combo?3.2.0pr1/build/yui/yui-min.js"></script>
     <script src="../src/outside-events.js"></script>
     <script>
         YUI().use('gallery-outside-events', function (Y) {
@@ -158,6 +158,7 @@
             Y.one('#show').on('click', function (e) {
                 if (!dialog.hasClass('hidden')) {
                     alert('The dialog is already visible, silly!');
+                    return;
                 }
                 
                 dialog.removeClass('hidden');
@@ -165,7 +166,7 @@
                 var handle = dialog.on('clickoutside', function (e) {
                     var targetId  = e.target.get('id');
                     
-                    if (targetId === 'link' && !this.hasClass('hidden')) {
+                    if (targetId === 'link' && !dialog.hasClass('hidden')) {
                         e.preventDefault();
                     }
                     
@@ -173,7 +174,7 @@
                         return;
                     }
                     
-                    this.addClass('hidden');
+                    dialog.addClass('hidden');
                     handle.detach();
                 });
             });
