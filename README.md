@@ -24,6 +24,13 @@ Subscribe to outside events as you would any other DOM event.
         this.addClass('hidden');
     });
 
+Delegation of outside events is supported beginning with YUI 3.2.0.
+
+    Y.one("#foo").delegate('clickoutside', function (e) { ... }, '#bar');
+
+Using delegation, the outside event will only fire when triggered by nodes
+matching the given CSS selector.
+
 ### Defining Outside Events
 
 Outside events can be defined for any native or synthetic DOM events.
@@ -105,6 +112,11 @@ Known Issues
 IE 6, IE 7 and IE 8 all incorrectly fail to bubble the `change`, `reset`,
 `select` and `submit` DOM  events, which prevents the corresponding outside 
 events from working.
+
+Contributors
+------------
+
+   * Eric Ferraiuolo <eferraiuolo@gmail.com>
 
 Acknowledgements
 ----------------
